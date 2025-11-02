@@ -1,0 +1,38 @@
+{
+  "compilerOptions": {
+    // -----------------------------
+    // File Layout
+    // -----------------------------
+    "rootDir": "./src",          // source files
+    "outDir": "./dist",          // compiled JS output
+    "moduleResolution": "node",  // resolve Node-style imports
+    "module": "commonjs",        // Node.js uses CommonJS
+    "target": "ES2020",          // modern JS target
+    "esModuleInterop": true,     // allows default import of commonjs modules
+
+    // -----------------------------
+    // Type Checking
+    // -----------------------------
+    "strict": true,                        // enable all strict checks
+    "noImplicitAny": true,                 // prevent implicit 'any'
+    "noImplicitReturns": true,             // functions must return consistently
+    "noFallthroughCasesInSwitch": true,
+    "exactOptionalPropertyTypes": true,
+    "noUncheckedIndexedAccess": true,
+
+    // -----------------------------
+    // Source Maps / Declarations
+    // -----------------------------
+    "sourceMap": true,          // helpful for debugging TS
+    "declaration": true,        // generates .d.ts files
+    "declarationMap": true,
+
+    // -----------------------------
+    // Node types
+    // -----------------------------
+    "types": ["node"],          // include Node.js type definitions
+    "skipLibCheck": true        // skip checking types of node_modules
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
