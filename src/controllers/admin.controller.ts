@@ -1,7 +1,7 @@
 import { Request,Response } from "express";
 import { StudentService } from "../services/student.service";
-import { studentSignupSchema } from "../validations/student.validation";
-import { CreateStudentRequest } from "../types/student.types";
+import { studentSignupSchema , studentUpdateSchema} from "../validations/student.validation";
+import { CreateStudentRequest , UpdateStudentRequest} from "../types/student.types";
 import dotenv from "dotenv";
 import Student from "../models/student.model";
 
@@ -64,36 +64,91 @@ export class AdminController{
         });
     }
 
+
     async renderDashboard(req: Request, res: Response) {
-        try {
-            const admin = (req.session as any).admin;
-            if (!admin) return res.redirect("/admin/login");
+    try {
+        const admin = (req.session as any).admin;
+        if (!admin) return res.redirect("/admin/login");
+        
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = 10; 
+        const skip = (page - 1) * limit;
 
-            const students = await Student.find().sort({createdAt: -1}).lean();
+        const totalStudents = await Student.countDocuments();
+        
+        const students = await Student.find()
+            .sort({createdAt: -1})
+            .skip(skip)
+            .limit(limit)
+            .lean();
 
-            const totalStudents = students.length;
-            const blockedCount = students.filter((s) => s.isBlocked).length;
-            const activeCount = totalStudents - blockedCount;
+        const blockedCount = await Student.countDocuments({ isBlocked: true });
+        const activeCount = totalStudents - blockedCount;
 
-            res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, private");
-            res.setHeader("Pragma", "no-cache");
-            res.setHeader("Expires", "0");
+        const totalPages = Math.ceil(totalStudents / limit);
+        const hasNextPage = page < totalPages;
+        const hasPrevPage = page > 1;
 
-            res.render("admin/dashboard", { 
-                title: "Admin dashboard", 
-                admin,
-                students,
-                stats: {
-                    total: totalStudents,
-                    active: activeCount,
-                    blocked: blockedCount,
-                },
-             });
-        } catch (error) {
-            console.error("Error loading dashboard:",error);
-            res.status(500).send("Error loading dashboard");
-        }
+        res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, private");
+        res.setHeader("Pragma", "no-cache");
+        res.setHeader("Expires", "0");
+
+        res.render("admin/dashboard", { 
+            title: "Admin dashboard", 
+            admin,
+            students,
+            stats: {
+                total: totalStudents,
+                active: activeCount,
+                blocked: blockedCount,
+            },
+            pagination: {
+                currentPage: page,
+                totalPages,
+                hasNextPage,
+                hasPrevPage,
+                limit
+            }
+         });
+    } catch (error) {
+        console.error("Error loading dashboard:",error);
+        res.status(500).send("Error loading dashboard");
     }
+}
+
+
+
+    // async renderDashboard(req: Request, res: Response) {
+    //     try {
+    //         const admin = (req.session as any).admin;
+    //         if (!admin) return res.redirect("/admin/login");
+            
+
+    //         const students = await Student.find().sort({createdAt: -1}).lean();
+
+    //         const totalStudents = students.length;
+    //         const blockedCount = students.filter((s) => s.isBlocked).length;
+    //         const activeCount = totalStudents - blockedCount;
+
+    //         res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, private");
+    //         res.setHeader("Pragma", "no-cache");
+    //         res.setHeader("Expires", "0");
+
+    //         res.render("admin/dashboard", { 
+    //             title: "Admin dashboard", 
+    //             admin,
+    //             students,
+    //             stats: {
+    //                 total: totalStudents,
+    //                 active: activeCount,
+    //                 blocked: blockedCount,
+    //             },
+    //          });
+    //     } catch (error) {
+    //         console.error("Error loading dashboard:",error);
+    //         res.status(500).send("Error loading dashboard");
+    //     }
+    // }
 
     async addNewStudent(req: Request<{},{}, CreateStudentRequest>,res: Response): Promise<void> {
         const parsed = studentSignupSchema.safeParse(req.body);
@@ -186,6 +241,7 @@ export class AdminController{
         }
     }
 
+
     async getStudent(req: Request, res: Response): Promise<void> {
         try {
             const { studentId } = req.params;
@@ -228,7 +284,7 @@ export class AdminController{
 
 
     async updateStudent(req: Request, res: Response): Promise<void> {
-        const parsed = studentSignupSchema.safeParse(req.body);
+        const parsed = studentUpdateSchema.safeParse(req.body);
         
         if (!parsed.success) {
             const firstError = parsed.error.issues?.[0]?.message || "Invalid input.";
@@ -252,7 +308,7 @@ export class AdminController{
                 return;
             }
 
-            const { fullName, email, password, dob, gender } = parsed.data;
+            const { fullName, email, dob, gender } = parsed.data;
 
             const student = await studentService.findById(studentId);
             
@@ -278,7 +334,6 @@ export class AdminController{
             const updatedStudent = await studentService.update(studentId, {
                 fullName,
                 email,
-                password,
                 dob: new Date(dob),
                 gender,
             });
@@ -304,6 +359,8 @@ export class AdminController{
             });
         }
     }
+
+
     async deleteStudent(req: Request, res: Response): Promise<void> {
         try {
             const { studentId } = req.params;

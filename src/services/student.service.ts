@@ -18,8 +18,10 @@ export class StudentService extends BaseService<IStudent>{
     }
 
     async update(id: string, updates: Partial<IStudent>): Promise<IStudent | null> {
-        if (updates.password) {
+        if (updates.password && updates.password.trim() !== '') {
             updates.password = await bcrypt.hash(updates.password, 10);
+        }else{
+            delete updates.password;
         }
         return await Student.findByIdAndUpdate(id, updates, { new: true });
     }

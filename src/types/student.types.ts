@@ -6,6 +6,13 @@ export interface CreateStudentRequest {
     gender: "Male" | "Female";
 }
 
+export interface UpdateStudentRequest {
+    fullName: string;
+    email: string;
+    dob: Date | string;
+    gender: "Male" | "Female";
+}
+
 export interface StudentResponse {
     id: string;
     fullName: string;

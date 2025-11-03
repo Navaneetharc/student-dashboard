@@ -17,13 +17,48 @@ export const studentSignupSchema = z.object({
     .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character"),
   dob: z
     .string()
-.refine((date) => {
+    .refine((date) => {
       const parsed = new Date(date);
 
       if (isNaN(parsed.getTime())) return false;
 
       const today = new Date();
        if (parsed > today) return false;
+       
+      let age = today.getFullYear() - parsed.getFullYear();
+
+      const monthDiff = today.getMonth() - parsed.getMonth();
+      const dayDiff = today.getDate() - parsed.getDate();
+
+      if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+        age--;
+      }
+
+      return age >= 4 && age <= 18;
+    }, "Student age must be between 4 and 18 years"),
+
+      gender: z.enum(["Male", "Female"], {
+      message: "Gender must be either Male or Female",
+    }),
+  });
+
+  export const studentUpdateSchema = z.object({
+  fullName: z
+    .string()
+    .min(3, "Full name must be at least 3 characters long")
+    .max(50, "Full name too long"),
+  email: z
+    .string()
+    .email("Please enter a valid email address"),
+  dob: z
+    .string()
+    .refine((date) => {
+      const parsed = new Date(date);
+
+      if (isNaN(parsed.getTime())) return false;
+
+      const today = new Date();
+      if (parsed > today) return false;
        
       let age = today.getFullYear() - parsed.getFullYear();
 
