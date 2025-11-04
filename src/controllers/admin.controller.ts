@@ -118,38 +118,6 @@ export class AdminController{
 
 
 
-    // async renderDashboard(req: Request, res: Response) {
-    //     try {
-    //         const admin = (req.session as any).admin;
-    //         if (!admin) return res.redirect("/admin/login");
-            
-
-    //         const students = await Student.find().sort({createdAt: -1}).lean();
-
-    //         const totalStudents = students.length;
-    //         const blockedCount = students.filter((s) => s.isBlocked).length;
-    //         const activeCount = totalStudents - blockedCount;
-
-    //         res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, private");
-    //         res.setHeader("Pragma", "no-cache");
-    //         res.setHeader("Expires", "0");
-
-    //         res.render("admin/dashboard", { 
-    //             title: "Admin dashboard", 
-    //             admin,
-    //             students,
-    //             stats: {
-    //                 total: totalStudents,
-    //                 active: activeCount,
-    //                 blocked: blockedCount,
-    //             },
-    //          });
-    //     } catch (error) {
-    //         console.error("Error loading dashboard:",error);
-    //         res.status(500).send("Error loading dashboard");
-    //     }
-    // }
-
     async addNewStudent(req: Request<{},{}, CreateStudentRequest>,res: Response): Promise<void> {
         const parsed = studentSignupSchema.safeParse(req.body);
         console.log("Incoming student data:", req.body);
