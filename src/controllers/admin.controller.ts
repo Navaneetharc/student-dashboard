@@ -120,10 +120,10 @@ export class AdminController{
 
     async addNewStudent(req: Request<{},{}, CreateStudentRequest>,res: Response): Promise<void> {
         const parsed = studentSignupSchema.safeParse(req.body);
-        console.log("Incoming student data:", req.body);
+        // console.log("student data from the input:", req.body);
         if(!parsed.success){
             const firstError = parsed.error.issues?.[0]?.message || "Invalid input.";
-            console.log("Validation error:", parsed.error.issues);
+            // console.log("Validation error:", parsed.error.issues);
 
             const students = await Student.find().sort({ createdAt: -1 }).lean();
             const totalStudents = students.length;
@@ -157,7 +157,7 @@ export class AdminController{
                 gender,
             })
 
-            console.log("New student added by admin:", student.email);
+            // console.log("New student added by admin:", student.email);
 
             res.status(200).json({
             success: true,
@@ -194,7 +194,7 @@ export class AdminController{
             student.isBlocked = !student.isBlocked;
             await student.save();
 
-            console.log("Student status updated:", student.isBlocked);
+            // console.log("Student status updated:", student.isBlocked);
 
             res.status(200).json({
             success: true,
@@ -256,7 +256,7 @@ export class AdminController{
         
         if (!parsed.success) {
             const firstError = parsed.error.issues?.[0]?.message || "Invalid input.";
-            console.log("Validation error:", parsed.error.issues);
+            // console.log("Validation error:", parsed.error.issues);
             
             res.status(400).json({
                 success: false,
@@ -306,7 +306,7 @@ export class AdminController{
                 gender,
             });
 
-            console.log("Student updated by admin:", updatedStudent?.email);
+            // console.log("Student updated by admin:", updatedStudent?.email);
 
             res.status(200).json({
                 success: true,
@@ -353,7 +353,7 @@ export class AdminController{
 
             await studentService.delete(studentId);
 
-            console.log("Student deleted by admin:", student.email);
+            // console.log("Student deleted by admin:", student.email);
 
             res.status(200).json({
                 success: true,

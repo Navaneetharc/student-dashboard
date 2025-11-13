@@ -4,8 +4,7 @@ import { StudentService } from "../services/student.service";
 import { CreateStudentRequest } from "../types/student.types";
 import { studentSignupSchema } from "../validations/student.validation";
 import bcrypt from "bcryptjs";
-import { title } from "process";
-import { error } from "console";
+
 
 
 export class StudentController {
@@ -33,7 +32,7 @@ export class StudentController {
 
   if (!parsed.success) {
     const firstError = parsed.error.issues?.[0]?.message || "Invalid input.";
-    console.log("Validation error:", parsed.error.issues);
+    // console.log("Validation error:", parsed.error.issues);
     res.status(400).render("student/signup", {
       title: "Student Sign Up",
       error: firstError,
