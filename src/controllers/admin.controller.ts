@@ -12,6 +12,7 @@ dotenv.config();
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL!;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD!;
 const studentService = new StudentService();
+
 export class AdminController{
     async handleAdminSignin(req: Request, res: Response): Promise<void> {
         try {
@@ -141,6 +142,7 @@ export class AdminController{
             const {fullName, email, password, dob, gender} = parsed.data;
 
             const existingStudent = await Student.findOne({ email });
+
             if (existingStudent) {
                 res.status(400).json({
                 success: false,
@@ -191,6 +193,7 @@ export class AdminController{
                 res.status(404).json({ success: false, message: "Student not found" });
                 return;
             }
+            
             student.isBlocked = !student.isBlocked;
             await student.save();
 

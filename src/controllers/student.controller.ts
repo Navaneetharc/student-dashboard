@@ -30,7 +30,7 @@ export class StudentController {
 
   const parsed = studentSignupSchema.safeParse(req.body);
 
-  if (!parsed.success) {
+  if(!parsed.success){
     const firstError = parsed.error.issues?.[0]?.message || "Invalid input.";
     // console.log("Validation error:", parsed.error.issues);
     res.status(400).render("student/signup", {
@@ -80,10 +80,11 @@ export class StudentController {
 
  async handleSignin(req: Request, res: Response): Promise<void> {
   try {
+
     const { email, password } = req.body;
 
     const student = await this.studentService.findByEmail(email);
-    if (!student) {
+    if (!student){
       return res.status(400).render("student/signin", {
         title: "Student Sign In",
         error: "Invalid email or password",
@@ -100,6 +101,7 @@ export class StudentController {
     }
 
     const isMatch = await bcrypt.compare(password, student.password);
+
     if (!isMatch) {
       return res.status(400).render("student/signin", {
         title: "Student Sign In",
@@ -131,7 +133,9 @@ export class StudentController {
   }
 }
 
+
   logout(req: Request, res: Response) {
+
     delete (req.session as any).student;
   
     req.session.save((err) => {
